@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    {% include "_user.html" %}
+
+    <form method="POST" action="">
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.phone.label }}<br>
+            {{ form.phone(size=32) }}<br>
+            {% for error in form.phone.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        
+        <p>
+            {{ form.dob.label }}<br>
+            {{ form.dob() }}<br>
+            {% for error in form.dob.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        
+        <p>
+            {{ form.gender.label }}<br>
+            {{ form.gender() }}<br>
+            {% for error in form.gender.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        
+        <p>
+            {{ form.address.label }}<br>
+            {{ form.address(rows=3) }}<br>
+            {% for error in form.address.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        
+        <p>
+            {{ form.state.label }}<br>
+            {{ form.state(size=32) }}<br>
+            {% for error in form.state.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        
+        <p>
+            {{ form.zip_code.label }}<br>
+            {{ form.zip_code(size=10) }}<br>
+            {% for error in form.zip_code.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        
+        <p>
+            {{ form.blood_group.label }}<br>
+            {{ form.blood_group() }}<br>
+            {% for error in form.blood_group.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        
+        <p>
+            <input type="submit" value="Update Profile">
+        </p>
+    </form>
+{% endblock %}

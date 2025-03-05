@@ -16,9 +16,9 @@ class User(UserMixin, db.Model):
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
     username: so.Mapped[str] = so.mapped_column(sa.String(64), index=True, unique=True, nullable=False)
     email: so.Mapped[str] = so.mapped_column(sa.String(120), index=True, unique=True, nullable=False)
-    phone: so.Mapped[str] = so.mapped_column(sa.String(10), nullable=False)
+    phone: so.Mapped[str] = so.mapped_column(sa.String(10), index=True, unique=True, nullable=False)
     password_hash: so.Mapped[Optional[str]] = so.mapped_column(sa.String(256))
-    is_admin: so.Mapped[Optional[bool]] = so.mapped_column(sa.Boolean, default=False)
+    is_admin: so.Mapped[Optional[bool]] = so.mapped_column(sa.Boolean, default=False, nullable=False)
     
     profile: so.Mapped['Profile'] = so.relationship('Profile', back_populates='user', uselist=False)
 
@@ -59,7 +59,7 @@ class Profile(db.Model):
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
     dob: so.Mapped[date] = so.mapped_column(sa.Date, nullable=False)
     gender: so.Mapped[GenderEnum] = so.mapped_column(sa.Enum(GenderEnum), nullable=False)
-    phone: so.Mapped[str] = so.mapped_column(sa.String(10), nullable=False)
+    address: so.Mapped[str] = so.mapped_column(sa.String(120), nullable=False)
     state: so.Mapped[str] = so.mapped_column(sa.String(100), nullable=False)
     zip_code: so.Mapped[str] = so.mapped_column(sa.String(10), nullable=False)
     blood_group: so.Mapped[BloodGroupEnum] = so.mapped_column(sa.Enum(BloodGroupEnum), nullable=False)

@@ -1,0 +1,9 @@
+<table>
+    <tr>
+        <td><img src="data:image/png;base64,{{ user.gen_avatar(size=36, write_png=False) }}"></td>
+        <td>
+            <h1>{{ user.username }}</h1>
+            {% if user.email %}<p>{{ user.email }}</p>{% endif %}
+        </td>
+    </tr>
+</table>

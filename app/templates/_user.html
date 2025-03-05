@@ -1,0 +1,13 @@
+<table>
+    <tr>
+        <td><img src="data:image/png;base64,{{ user.gen_avatar(size=120, write_png=False) }}"></td>
+        <td>
+            <h1>{{ user.username }}</h1>
+            {% if user.email %}<p>{{ user.email }}</p>{% endif %}
+            {% if user.phone %}<p>{{ user.phone }}</p>{% endif %}
+            {% if user == current_user %}
+            <p><a href="{{ url_for('profile', username=user.username) }}">Update</a></p>
+            {% endif %}
+        </td>
+    </tr>
+</table>

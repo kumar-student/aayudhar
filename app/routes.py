@@ -6,8 +6,8 @@ from flask_login import current_user, login_user, logout_user, login_required
 
 from app import db
 from app import app
-from app.models import User
-from app.forms import RegistrationForm, LoginForm
+from app.models import User, Profile
+from app.forms import RegistrationForm, LoginForm, ProfileForm
 
 @app.route('/')
 @app.route('/index')
@@ -54,3 +54,53 @@ def logout():
 def user(username):
     user = db.first_or_404(sa.select(User).where(User.username == username))
     return render_template("user.html", user=user)
+
+@app.route("/user/<username>/edit", methods=["GET", "POST"])
+def profile(username):
+    user = db.first_or_404(sa.select(User).where(User.username == username))
+
+    if user != current_user and not current_user.is_admin:
+        flash('You do not have permission to edit this profile.', 'danger')
+        return redirect(url_for('index'))
+
+    form = ProfileForm()
+
+    if request.method == "GET":
+        form.phone.data = user.phone
+        if user.profile:
+            form.dob.data = user.profile.dob
+            form.gender.data = user.profile.gender.name if user.profile.gender else None
+            form.address.data = user.profile.address
+            form.state.data = user.profile.state
+            form.zip_code.data = user.profile.zip_code
+            form.blood_group.data = user.profile.blood_group.name if user.profile.blood_group else None
+
+    if form.validate_on_submit():
+        user.phone = form.phone.data
+        
+        # Update profile details
+        if user.profile:
+            user.profile.dob = form.dob.data
+            user.profile.gender = form.gender.data
+            user.profile.address = form.address.data
+            user.profile.state = form.state.data
+            user.profile.zip_code = form.zip_code.data
+            user.profile.blood_group = form.blood_group.data
+        else:
+            # Create a new profile if it doesn't exist
+            new_profile = Profile(
+                dob=form.dob.data,
+                gender=form.gender.data,
+                address=form.address.data,
+                state=form.state.data,
+                zip_code=form.zip_code.data,
+                blood_group=form.blood_group.data,
+                user=user
+            )
+            db.session.add(new_profile)
+
+        db.session.commit()
+        flash('Your profile has been updated!', 'success')
+        return redirect(url_for('user', username=user.username))
+
+    return render_template('profile.html', form=form, user=user)
