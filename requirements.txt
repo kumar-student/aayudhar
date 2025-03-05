@@ -4,3 +4,4 @@ flask-migrate
 flask-wtf
 email-validator
 flask-login
+pydenticon

@@ -49,3 +49,8 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for("index"))
+
+@app.route("/user/<username>")
+def user(username):
+    user = db.first_or_404(sa.select(User).where(User.username == username))
+    return render_template("user.html", user=user)

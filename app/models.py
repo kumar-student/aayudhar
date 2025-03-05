@@ -1,7 +1,9 @@
+import os
 import sqlalchemy as sa
 import sqlalchemy.orm as so
 from typing import Optional
 from flask_login import UserMixin
+import pydenticon, hashlib, base64
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from app import db
@@ -22,8 +24,32 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+    def gen_avatar(self, size=36, write_png=True):
+        foreground = [ 
+            "rgb(45,79,255)",
+            "rgb(254,180,44)",
+            "rgb(226,121,234)",
+            "rgb(30,179,253)",
+            "rgb(232,77,65)",
+            "rgb(49,203,115)",
+            "rgb(141,69,170)"
+        ]
+        background = "rgb(256,256,256)"
+
+        digest = hashlib.md5(self.email.lower().encode('utf-8')).hexdigest()
+        basedir = os.path.abspath(os.path.dirname(__file__))
+        pngloc = os.path.join(basedir, 'usercontent', 'identicon', str(digest) + '.png')
+        icongen = pydenticon.Generator(5, 5, digest=hashlib.md5, foreground=foreground, background=background)
+        pngicon = icongen.generate(self.email, size, size, padding=(8, 8, 8, 8), inverted=False, output_format="png")
+        if write_png:
+            pngfile = open(pngloc, "wb")
+            pngfile.write(pngicon)
+            pngfile.close()
+        else:
+            return str(base64.b64encode(pngicon))[2:-1]
     def __repr__(self):
         return '<User {}>'.format(self.username)
+
 
 @login.user_loader
 def load_user(id):

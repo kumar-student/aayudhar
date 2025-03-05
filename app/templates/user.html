@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <table>
+        <tr>
+            <td><img src="data:image/png;base64,{{ user.gen_avatar(size=120, write_png=False) }}"></td>
+            <td>
+                <h1>User: {{ user.username }}</h1>
+                {% if user.email %}<p>{{ user.email }}</p>{% endif %}
+                {% if user.phone %}<p>{{ user.phone }}</p>{% endif %}
+            </td>
+        </tr>
+    </table>
+    <hr>
+    {% if user.profile %}
+    <table>
+        <tr valign="top">
+            {% if user.profile.dob %}
+            <td><p>Date of birth</p></td>
+            <td>{{ user.profile.dob }}</td>
+            {% endif %}
+        </tr>
+    </table>
+    {% else %}
+    <p>Don't have a profile yet! <a>Create profile</a></p>
+    {% endif %}
+{% endblock %}
