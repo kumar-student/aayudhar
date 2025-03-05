@@ -1,5 +1,6 @@
 import os
 import sqlalchemy as sa
+from datetime import date
 import sqlalchemy.orm as so
 from typing import Optional
 from flask_login import UserMixin
@@ -8,15 +9,18 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 from app import db
 from app import login
+from app.enums import GenderEnum, BloodGroupEnum
 
 
 class User(UserMixin, db.Model):
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
-    username: so.Mapped[str] = so.mapped_column(sa.String(64), index=True, unique=True)
-    email: so.Mapped[str] = so.mapped_column(sa.String(120), index=True, unique=True)
-    phone: so.Mapped[str] = so.mapped_column(sa.String(10))
+    username: so.Mapped[str] = so.mapped_column(sa.String(64), index=True, unique=True, nullable=False)
+    email: so.Mapped[str] = so.mapped_column(sa.String(120), index=True, unique=True, nullable=False)
+    phone: so.Mapped[str] = so.mapped_column(sa.String(10), nullable=False)
     password_hash: so.Mapped[Optional[str]] = so.mapped_column(sa.String(256))
     is_admin: so.Mapped[Optional[bool]] = so.mapped_column(sa.Boolean, default=False)
+    
+    profile: so.Mapped['Profile'] = so.relationship('Profile', back_populates='user', uselist=False)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -49,6 +53,22 @@ class User(UserMixin, db.Model):
             return str(base64.b64encode(pngicon))[2:-1]
     def __repr__(self):
         return '<User {}>'.format(self.username)
+
+
+class Profile(db.Model):
+    id: so.Mapped[int] = so.mapped_column(primary_key=True)
+    dob: so.Mapped[date] = so.mapped_column(sa.Date, nullable=False)
+    gender: so.Mapped[GenderEnum] = so.mapped_column(sa.Enum(GenderEnum), nullable=False)
+    phone: so.Mapped[str] = so.mapped_column(sa.String(10), nullable=False)
+    state: so.Mapped[str] = so.mapped_column(sa.String(100), nullable=False)
+    zip_code: so.Mapped[str] = so.mapped_column(sa.String(10), nullable=False)
+    blood_group: so.Mapped[BloodGroupEnum] = so.mapped_column(sa.Enum(BloodGroupEnum), nullable=False)
+
+    user_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(User.id), index=True, unique=True, nullable=False)
+    user: so.Mapped['User'] = so.relationship('User', back_populates='profile')
+
+    def __repr__(self):
+        return '<Profile for User {}>'.format(self.user.username)
 
 
 @login.user_loader
