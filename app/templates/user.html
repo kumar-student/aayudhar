@@ -2,6 +2,9 @@
 
 {% block content %}
     {% include "_user.html" %}
+    {% if user == current_user %}
+    <p><a href="{{ url_for('profile', username=user.username) }}">Update</a></p>
+    {% endif %}
     <hr>
     {% if user.profile %}
     <table>
