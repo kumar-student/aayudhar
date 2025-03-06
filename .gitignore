@@ -172,4 +172,4 @@ cython_debug/
 .pypirc
 
 # Files
-app/static/images/avatar/
+app/static/images/avatar/*

@@ -28,4 +28,26 @@ class PasswordStrength:
         if not re.search(r"[!@#$%^&*(),.?\":{}|<>]", password_data):
             message = field.gettext("Password must contain at least one special character.")
             raise ValidationError(message)
+
+class FileExtensionValidator:
+    def __init__(self, allowed_extensions):
+        self.allowed_extensions = allowed_extensions
+
+    def __call__(self, form, field):
+        if not field.data:
+            return
         
+        filename = field.data.filename
+        if '.' not in filename or filename.rsplit('.', 1)[1].lower() not in self.allowed_extensions:
+            raise ValidationError('File must have one of the following extensions: ' + ', '.join(self.allowed_extensions))
+
+class FileMimeTypeValidator:
+    def __init__(self, allowed_mimetypes):
+        self.allowed_mimetypes = allowed_mimetypes
+
+    def __call__(self, form, field):
+        if not field.data:
+            return
+
+        if field.data.mimetype not in self.allowed_mimetypes:
+            raise ValidationError('File must be a JPEG or PNG image.')

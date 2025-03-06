@@ -1,6 +1,12 @@
 import sqlalchemy as sa
 from flask_wtf import FlaskForm
-from wtforms.validators import DataRequired, ValidationError, Email, EqualTo, Length
+from wtforms.validators import (
+    DataRequired, 
+    ValidationError, 
+    Email, 
+    EqualTo, 
+    Length
+)
 from wtforms import (
     StringField, 
     PasswordField, 
@@ -14,8 +20,12 @@ from wtforms import (
 
 from app import db
 from app.models import User
-from app.validators import PasswordStrength
 from app.enums import GenderEnum, BloodGroupEnum
+from app.validators import (
+    PasswordStrength, 
+    FileExtensionValidator, 
+    FileMimeTypeValidator
+)
 
 class RegistrationForm(FlaskForm):
     username = StringField("Username", validators=[DataRequired()])
@@ -46,7 +56,10 @@ class LoginForm(FlaskForm):
     submit = SubmitField("Sign In")
 
 class ProfileForm(FlaskForm):
-    avatar = FileField('Upload Avatar')
+    avatar = FileField('Upload Avatar', validators=[
+        FileExtensionValidator(allowed_extensions={'jpg', 'jpeg', 'png'}),
+        FileMimeTypeValidator(allowed_mimetypes={'image/jpeg', 'image/png'})
+    ])
     phone = StringField("Phone", validators=[DataRequired(), Length(min=10, max=15)])
     dob = DateField("Date of Birth", format='%Y-%m-%d', validators=[DataRequired()])
     gender = SelectField("Gender", choices=[(g.name, g.value) for g in GenderEnum], validators=[DataRequired()])

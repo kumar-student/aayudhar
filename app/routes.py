@@ -78,16 +78,14 @@ def profile(username):
             form.blood_group.data = user.profile.blood_group.name if user.profile.blood_group else None
 
     if form.validate_on_submit():
-        if form.avatar.data:  # This should be a file object
-            file = form.avatar.data  # This is the file object
-            filename = secure_filename(file.filename)  # Get the filename
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))  # Save the file
+        if form.avatar.data:
+            file = form.avatar.data
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             
-            # Update the user's avatar URL in the database
-            current_user.avatar = os.path.join('images', 'avatars', filename)
+            user.avatar = os.path.join('images', 'avatars', filename)
         user.phone = form.phone.data
         
-        # Update profile details
         if user.profile:
             user.profile.dob = form.dob.data
             user.profile.gender = form.gender.data
@@ -96,7 +94,6 @@ def profile(username):
             user.profile.zip_code = form.zip_code.data
             user.profile.blood_group = form.blood_group.data
         else:
-            # Create a new profile if it doesn't exist
             new_profile = Profile(
                 dob=form.dob.data,
                 gender=form.gender.data,
