@@ -1,6 +1,8 @@
+import os
 import sqlalchemy as sa
 from flask import request
 from urllib.parse import urlsplit
+from werkzeug.utils import secure_filename
 from flask import render_template, flash, redirect, url_for
 from flask_login import current_user, login_user, logout_user, login_required
 
@@ -59,7 +61,7 @@ def user(username):
 def profile(username):
     user = db.first_or_404(sa.select(User).where(User.username == username))
 
-    if user != current_user and not current_user.is_admin:
+    if current_user.is_anonymous or user != current_user and not current_user.is_admin:
         flash('You do not have permission to edit this profile.', 'danger')
         return redirect(url_for('index'))
 
@@ -76,6 +78,13 @@ def profile(username):
             form.blood_group.data = user.profile.blood_group.name if user.profile.blood_group else None
 
     if form.validate_on_submit():
+        if form.avatar.data:  # This should be a file object
+            file = form.avatar.data  # This is the file object
+            filename = secure_filename(file.filename)  # Get the filename
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))  # Save the file
+            
+            # Update the user's avatar URL in the database
+            current_user.avatar = os.path.join('images', 'avatars', filename)
         user.phone = form.phone.data
         
         # Update profile details

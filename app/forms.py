@@ -1,7 +1,16 @@
 import sqlalchemy as sa
 from flask_wtf import FlaskForm
 from wtforms.validators import DataRequired, ValidationError, Email, EqualTo, Length
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, DateField, SelectField, TextAreaField
+from wtforms import (
+    StringField, 
+    PasswordField, 
+    BooleanField, 
+    SubmitField, 
+    DateField, 
+    SelectField, 
+    TextAreaField,
+    FileField
+)
 
 from app import db
 from app.models import User
@@ -37,6 +46,7 @@ class LoginForm(FlaskForm):
     submit = SubmitField("Sign In")
 
 class ProfileForm(FlaskForm):
+    avatar = FileField('Upload Avatar')
     phone = StringField("Phone", validators=[DataRequired(), Length(min=10, max=15)])
     dob = DateField("Date of Birth", format='%Y-%m-%d', validators=[DataRequired()])
     gender = SelectField("Gender", choices=[(g.name, g.value) for g in GenderEnum], validators=[DataRequired()])
@@ -44,4 +54,4 @@ class ProfileForm(FlaskForm):
     state = StringField("State", validators=[DataRequired(), Length(min=3, max=100)])
     zip_code = StringField("Zip Code", validators=[DataRequired(), Length(min=5, max=10)])
     blood_group = SelectField("Blood Group", choices=[(bg.name, bg.value) for bg in BloodGroupEnum])
-    submit = SubmitField("Submit")
+    submit = SubmitField("Update")
