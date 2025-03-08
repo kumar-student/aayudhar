@@ -2,45 +2,45 @@
 
 {% block content %}
     {% include "_user.html" %}
-    {% if user == current_user %}
-    <p><a href="{{ url_for('profile', username=user.username) }}">Update</a></p>
+    {% if user == current_user or current_user.is_admin%}
+    <p><a href="{{ url_for('profile', username=user.username) }}">Edit</a></p>
     {% endif %}
     <hr>
     {% if user.profile %}
     <table>
         <tr valign="top">
             {% if user.profile.dob %}
-            <td><strong>Date of birth</strong> </td>
+            <td><strong>Date of birth </strong></td>
             <td>: {{ user.profile.dob }}</td>
             {% endif %}
         </tr>
         <tr valign="top">
             {% if user.profile.gender %}
-            <td><strong>Gender</strong> </td>
+            <td><strong>Gender </strong></td>
             <td>: {{ user.profile.gender.value }}</td>
             {% endif %}
         </tr>
         <tr valign="top">
             {% if user.profile.address %}
-            <td><strong>Address</strong> </td>
+            <td><strong>Address </strong></td>
             <td>: {{ user.profile.address }}</td>
             {% endif %}
         </tr>
         <tr valign="top">
             {% if user.profile.state %}
-            <td><strong>State</strong> </td>
+            <td><strong>State </strong></td>
             <td>: {{ user.profile.state }}</td>
             {% endif %}
         </tr>
         <tr valign="top">
             {% if user.profile.zip_code %}
-            <td><strong>Zip code</strong> </td>
+            <td><strong>Zip code </strong></td>
             <td>: {{ user.profile.zip_code }}</td>
             {% endif %}
         </tr>
         <tr valign="top">
             {% if user.profile.blood_group %}
-            <td><strong>Blood group</strong> </td>
+            <td><strong>Blood group </strong></td>
             <td>: {{ user.profile.blood_group.value }}</td>
             {% endif %}
         </tr>

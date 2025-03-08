@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+    {% include "_hospital.html" %}
+    {% if current_user.is_admin %}
+    <p><a href="{{ url_for('edit_hospital', hrn=hospital.hrn) }}">Edit</a></p>
+    {% endif %}
+    <hr>
+    <table>
+        <tr valgn="top">
+            {% if hospital.hrn %}
+            <td><strong>Registration no </strong></td>
+            <td>: {{ hospital.hrn }}</td>
+            {% endif %}
+        </tr>
+        <tr valign="top">
+            {% if hospital.email %}
+            <td><strong>Emial </strong></td>
+            <td>: {{ hospital.email }}</td>
+            {% endif %}
+        </tr>
+        <tr valign="top">
+            {% if hospital.phone %}
+            <td><strong>Phone </strong> </td>
+            <td>: {{ hospital.phone }}</td>
+            {% endif %}
+        </tr>
+        <tr valign="top">
+            {% if hospital.state %}
+            <td><strong>State </strong> </td>
+            <td>: {{ hospital.state }}</td>
+            {% endif %}
+        </tr>
+        <tr valign="top">
+            {% if hospital.zip_code %}
+            <td><strong>Zip code </strong> </td>
+            <td>: {{ hospital.zip_code }}</td>
+            {% endif %}
+        </tr>
+    </table>
+{% endblock %}

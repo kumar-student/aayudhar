@@ -1,0 +1,23 @@
+<table>
+    <tr>
+        <td>
+            {% if hospital.image %}
+            <img src="{{ url_for('static', filename=hospital.image) }}" alt="Hospital Image" style="width: 128px; height: 128px;">
+            {% else %}
+            <img src="{{ url_for('static', filename='images/image.png') }}" alt="Default Image" style="width: 128px; height: 128px;">
+            {% endif %}
+        </td>
+        <td>
+            <h1>{{ hospital.name }}</h1>
+            {% if hospital.city_or_town %}<p>{{ hospital.city_or_town }}</p>{% endif %}
+            {% if hospital.state %}
+                <p>
+                    {{ hospital.state }}
+                    {% if hospital.zip_code %}
+                     - {{ hospital.zip_code }}
+                    {% endif %}
+                </p>
+            {% endif %}
+        </td>
+    </tr>
+</table>

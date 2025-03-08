@@ -55,7 +55,6 @@ class User(UserMixin, db.Model):
     def __repr__(self):
         return '<User {}>'.format(self.username)
 
-
 class Profile(db.Model):
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
     dob: so.Mapped[date] = so.mapped_column(sa.Date, nullable=False)
@@ -71,6 +70,20 @@ class Profile(db.Model):
     def __repr__(self):
         return '<Profile for User {}>'.format(self.user.username)
 
+class Hospital(db.Model):
+    id: so.Mapped[int] = so.mapped_column(primary_key=True)
+    name: so.Mapped[str] = so.mapped_column(sa.String(64), unique=True, nullable=False)
+    image: so.Mapped[Optional[str]] = so.mapped_column(sa.String(256), nullable=True)
+    hrn: so.Mapped[str] = so.mapped_column(sa.String(32), index=True, unique=True, nullable=False)
+    address: so.Mapped[str] = so.mapped_column(sa.String(120), nullable=False)
+    city_or_town: so.Mapped[str] = so.mapped_column(sa.String(100), nullable=False)
+    state: so.Mapped[str] = so.mapped_column(sa.String(100), nullable=False)
+    zip_code: so.Mapped[str] = so.mapped_column(sa.String(10), nullable=False)
+    phone: so.Mapped[str] = so.mapped_column(sa.String(10), unique=True, nullable=False)
+    email: so.Mapped[str] = so.mapped_column(sa.String(120), unique=True, nullable=False)
+
+    def __repr__(self):
+        return '<Hospital {} - {}>'.format(self.name, self.hrn)
 
 @login.user_loader
 def load_user(id):

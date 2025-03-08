@@ -8,8 +8,17 @@ from flask_login import current_user, login_user, logout_user, login_required
 
 from app import db
 from app import app
-from app.models import User, Profile
-from app.forms import RegistrationForm, LoginForm, ProfileForm
+from app.models import (
+    User, 
+    Profile, 
+    Hospital
+)
+from app.forms import (
+    RegistrationForm, 
+    LoginForm, 
+    ProfileForm, 
+    HospitalForm
+)
 
 @app.route('/')
 @app.route('/index')
@@ -58,6 +67,7 @@ def user(username):
     return render_template("user.html", user=user)
 
 @app.route("/user/<username>/edit", methods=["GET", "POST"])
+@login_required
 def profile(username):
     user = db.first_or_404(sa.select(User).where(User.username == username))
 
@@ -81,7 +91,7 @@ def profile(username):
         if form.avatar.data:
             file = form.avatar.data
             filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            file.save(os.path.join(app.config['AVATAR_UPLOAD_FOLDER'], filename))
             
             user.avatar = os.path.join('images', 'avatars', filename)
         user.phone = form.phone.data
@@ -110,3 +120,93 @@ def profile(username):
         return redirect(url_for('user', username=user.username))
 
     return render_template('profile.html', form=form, user=user)
+
+@app.route("/hospitals", methods=["GET", "POST"])
+@login_required
+def hospitals():
+    hospitals = db.session.scalars(db.select(Hospital)).all()
+    return render_template("hospitals.html", hospitals=hospitals)
+
+@app.route("/hospitals/add", methods=["GET", "POST"])
+@login_required
+def create_hospital():
+    if current_user.is_anonymous or not current_user.is_admin:
+        flash('You do not have permission to create hospital record', 'danger')
+        return redirect(url_for('index'))
+    
+    form = HospitalForm()
+    if form.validate_on_submit():
+        hospital = Hospital(
+            name=form.name.data,
+            hrn=form.hrn.data,
+            address=form.address.data,
+            city_or_town=form.city_or_town.data,
+            state=form.state.data,
+            zip_code=form.zip_code.data,
+            phone=form.phone.data,
+            email=form.email.data
+        )
+        if form.image.data:
+            file = form.image.data
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['IMAGE_UPLOAD_FOLDER'], filename))
+            
+            hospital.image = os.path.join('images', 'hospitals', filename)
+        db.session.add(hospital)
+        db.session.commit()
+        flash('Hospital added successfully', 'success')
+        return redirect(url_for('hospital_details', hrn=hospital.hrn))
+    else:
+        print(form.errors)
+    return render_template("hospital_form.html", form=form, hospital=None)
+
+@app.route("/hospitals/<hrn>/edit", methods=["GET", "POST"])
+@login_required
+def edit_hospital(hrn):
+    hospital = db.first_or_404(sa.select(Hospital).where(Hospital.hrn == hrn))
+
+    if not current_user.is_admin:
+        flash('You do not have permission to edit this profile.', 'danger')
+        return redirect(url_for('hospitals'))
+    
+    form = HospitalForm()
+
+    if request.method == "GET":
+        form.name.data = hospital.name
+        form.hrn.data = hospital.hrn
+        form.current_hrn.data = hospital.hrn
+        form.address.data = hospital.address
+        form.city_or_town.data = hospital.city_or_town
+        form.state.data = hospital.state
+        form.zip_code.data = hospital.zip_code
+        form.phone.data = hospital.phone
+        form.email.data = hospital.email        
+
+    if form.validate_on_submit():
+        hospital.name = form.name.data
+        hospital.hrn = form.hrn.data
+        hospital.address = form.address.data
+        hospital.city_or_town = form.city_or_town.data
+        hospital.state = form.state.data
+        hospital.zip_code = form.zip_code.data
+        hospital.phone = form.phone.data
+        hospital.email = form.email.data
+
+        # Only update the image if a new one is uploaded
+        if form.image.data:
+            file = form.image.data
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['IMAGE_UPLOAD_FOLDER'], filename))
+            hospital.image = os.path.join('images', 'hospitals', filename)
+
+        db.session.commit()
+        flash('Hospital details have been updated!', 'success')
+        return redirect(url_for('hospital_details', hrn=hospital.hrn))
+    
+    return render_template("hospital_form.html", form=form, hospital=hospital)
+
+@app.route("/hospitals/<hrn>/")
+@login_required
+def hospital_details(hrn):
+    hospital = db.first_or_404(sa.select(Hospital).where(Hospital.hrn == hrn))
+    return render_template("hospital.html", hospital=hospital)

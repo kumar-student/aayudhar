@@ -4,7 +4,7 @@
             {% if user.avatar %}
             <img src="{{ url_for('static', filename=user.avatar) }}" alt="User Avatar" style="width: 44px; height: 44px;">
             {% else %}
-            <img src="data:image/png;base64,{{ user.gen_avatar(size=36, write_png=False) }}" style="width: 44px; height: 44px;">
+            <img src="data:image/png;base64,{{ user.gen_avatar(size=36, write_png=False) }}" alt="Dynamic Image" style="width: 44px; height: 44px;">
             {% endif %}
         </td>
         <td>

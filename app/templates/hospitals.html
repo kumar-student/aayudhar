@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+    {% if hospitals %}
+    {% for hospital in hospitals %}
+        <a href="{{ url_for('hospital_details', hrn=hospital.hrn) }}">
+        {% include "_hospital.html" %}
+        </a>
+    {% endfor %}
+    {% else %}
+        {% if current_user.is_admin %}
+        <p><a href="{{ url_for('create_hospital') }}">Add Hospital</a></p>
+        {% endif %}
+    {% endif %}
+{% endblock %}
