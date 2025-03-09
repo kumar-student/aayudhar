@@ -15,3 +15,10 @@ class BloodGroupEnum(str, Enum):
     AB_NEGATIVE = "AB-"
     O_POSITIVE = "O+"
     O_NEGATIVE = "O-"
+
+class DonorApplicationStatusEnum(str, Enum):
+     PENDING = "Pending"
+     CANCELLED = "Cancelled"
+     PROCESSING = "Processing"
+     APPROVED = "Approved"
+     REJECTED = "Rejected"

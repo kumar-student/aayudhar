@@ -1,0 +1,1 @@
+DONOR_APPLICATION_VALID_FOR = 5     # Days

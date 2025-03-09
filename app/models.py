@@ -5,11 +5,16 @@ import sqlalchemy.orm as so
 from typing import Optional
 from flask_login import UserMixin
 import pydenticon, hashlib, base64
+from datetime import datetime, timezone
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from app import db
 from app import login
-from app.enums import GenderEnum, BloodGroupEnum
+from app.enums import (
+    GenderEnum, 
+    BloodGroupEnum, 
+    DonorApplicationStatusEnum
+)
 
 
 class User(UserMixin, db.Model):
@@ -22,6 +27,7 @@ class User(UserMixin, db.Model):
     is_admin: so.Mapped[Optional[bool]] = so.mapped_column(sa.Boolean, default=False, nullable=False)
     
     profile: so.Mapped['Profile'] = so.relationship('Profile', back_populates='user', uselist=False)
+    applications: so.WriteOnlyMapped['DonorApplication'] = so.relationship(back_populates='applicant')
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -69,6 +75,23 @@ class Profile(db.Model):
 
     def __repr__(self):
         return '<Profile for User {}>'.format(self.user.username)
+
+class DonorApplication(db.Model):
+    id: so.Mapped[int] = so.mapped_column(primary_key=True)
+    height: so.Mapped[float] = so.mapped_column(sa.Float(), nullable=False)
+    wight: so.Mapped[float] = so.mapped_column(sa.Float(), nullable=False)
+    habbits: so.Mapped[float] = so.mapped_column(sa.String(256))
+    uidn: so.Mapped[str] = so.mapped_column(sa.String(4), nullable=False)
+    timestamp: so.Mapped[datetime] = so.mapped_column(index=True, default=lambda: datetime.now(timezone.utc))
+    user_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(User.id), index=True)
+    applicant: so.Mapped[User] = so.relationship(back_populates='applications')
+    status: so.Mapped[DonorApplicationStatusEnum] = so.mapped_column(
+        sa.Enum(DonorApplicationStatusEnum), 
+        nullable=False,
+        default=DonorApplicationStatusEnum.PENDING
+    )
+    def __repr__(self):
+        return '<DonorApplication of User {}>'.format(self.applicant.username)
 
 class Hospital(db.Model):
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
